@@ -13,7 +13,6 @@ identify==2.2.13
 idna==3.2
 iniconfig==1.1.1
 mccabe==0.6.1
--e git+https://github.com/hpduongducnhan/ndd_tools.git@13e06b9e418ec043c318cd2e450b3aff8ae8f3b8#egg=ndd_tools
 nodeenv==1.6.0
 packaging==21.0
 platformdirs==2.2.0
