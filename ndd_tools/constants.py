@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 KW_LOGGER = 'logger'
+KW_LOGGER_CONFIG = 'logger_config'
 
 LOGGER = '_logger'
 LOGGER_CONFIG = '_logger_config'

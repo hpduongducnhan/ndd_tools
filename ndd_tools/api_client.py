@@ -6,7 +6,7 @@ import urllib3
 from .others import load_config, add_proxy
 from .data_models import ProxyModel, TargetAPI, RequestResponse, ApiClientConfig, LoggerConfig
 from .logger_mixin import LoggerMixin
-from .constants import KW_LOGGER
+from .constants import KW_LOGGER_CONFIG
 
 
 class ApiClient(LoggerMixin):
@@ -14,18 +14,12 @@ class ApiClient(LoggerMixin):
         self,
         config_file_path: str,
         proxy: ProxyModel = None,
-        enable_debug: bool = False,
         disable_ssl_warning=True,
         **kwargs
     ) -> None:
         # inherit logger or default logger
-        self.set_logger_up(LoggerConfig(
-            logger=kwargs.get(KW_LOGGER),
-        ))
+        self.set_logger_up(kwargs.get(KW_LOGGER_CONFIG))
 
-        self.enable_debug = enable_debug
-        if self.enable_debug:
-            self.set_logger_debug_mode(True)
 
         if disable_ssl_warning:
             self.logger.debug('disable InsecureRequestWarning')
