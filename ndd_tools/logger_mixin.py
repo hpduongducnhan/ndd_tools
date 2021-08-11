@@ -113,6 +113,8 @@ class LoggerMixin:
 
     @property   # getter
     def logger_config(self):
+        if not hasattr(self, LOGGER_CONFIG):
+            return LoggerConfig()
         return getattr(self, LOGGER_CONFIG)
 
     @property   # getter

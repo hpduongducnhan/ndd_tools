@@ -152,3 +152,12 @@ def test_logger_mixin_debug_mode():
     # turn debug off
     x.set_logger_debug_mode(False)
     assert len(x.logger.handlers) == 0
+
+
+def test_logger_mixin_get_logger_config():
+    class X(Example, LoggerMixin):
+        def __init__(self) -> None:
+            super().__init__()
+    x = X()
+    assert x.logger_config
+    assert isinstance(x.logger_config, LoggerConfig)
