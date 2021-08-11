@@ -21,17 +21,17 @@ class A(LoggerMixin):
         # get current logger config
         self.get_logger_config()
 
-        # incase you want create new logger 
-        # recreate new logger_config then use 
+        # incase you want create new logger
+        # recreate new logger_config then use
         self.set_logger_up(new_logger_config)
 
 
 
     def run(self):
-        self.debug('this is debug log message') 
-        self.info('this is info log message') 
-        self.warn('this is warn log message') 
-        self.error('this is error log message') 
+        self.debug('this is debug log message')
+        self.info('this is info log message')
+        self.warn('this is warn log message')
+        self.error('this is error log message')
         self.critical('this is critical log message')
 
 ```
