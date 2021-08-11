@@ -13,13 +13,14 @@ class LoggerConfig(BaseModel):
     logger: Optional[LoggerFieldType]
     name: Optional[str]
     level: Optional[int]
-    propagate: bool = False
     formatter: Optional[str] = LOGGER_FORMATTER
+    propagate: bool = False
     unique_logger: bool = False
+    enable_log_file: bool = False
+    enable_debug: bool = False
     unique_name: Optional[str]
     log_file_path: Optional[str]
     log_file_name: Optional[str]
-    enable_log_file: bool = False
 
     @validator('level')
     def is_logging_level(cls, v):
