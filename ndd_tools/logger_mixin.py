@@ -64,6 +64,7 @@ class LoggerMixin:
         if config.logger:
             config.name = config.logger.name
             config.level = config.logger.level
+            setattr(self, LOGGER_CONFIG, config)
             setattr(self, LOGGER, config.logger)
             return
         # set default logger level
