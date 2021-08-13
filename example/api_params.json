@@ -9,7 +9,8 @@
         "Content-Type": "application/json"
       },
       "parameters": {
-        "hello": "world"
+        "hello": "world",
+        "*hello": "world"
       },
       "save_response": false
     }

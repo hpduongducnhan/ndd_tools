@@ -31,10 +31,16 @@ class ApiClient(LoggerMixin):
         self.config: ApiClientConfig = load_config(config_file_path)
         self.logger.debug(f'config file -> {self.config}')
 
+    def _remove_allow_duplicated_string(self, key: str):
+        while key.startswith('*'):
+            key = key[1:]
+        return key
+
     def _make_url_for_get_method(self, url: str, params: Dict) -> str:
         url += '?'
         for k, v in params.items():
-            url += f'{str(k)}={str(v)}&'
+            _k = self._remove_allow_duplicated_string(k)
+            url += f'{str(_k)}={str(v)}&'
         if url.endswith('&'):
             url = url[0:-1]
         self.logger.debug(f'make url result -> {url}')
