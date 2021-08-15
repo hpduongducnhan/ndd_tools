@@ -18,6 +18,10 @@ def find_logger_handler_stream_stdout(handlers: List[logging.Handler]):
             found_handler.close()
             return found_handler
 
+def close_file_handler(handlers: List[logging.FileHandler]):
+    for handler in handlers:
+        handler.close()
+
 
 class LoggerMixin:
     def set_logger_debug_mode(self, mode: bool) -> None:
@@ -95,14 +99,41 @@ class LoggerMixin:
             _logger.setLevel(config.level)
         # check if need add file handler
         if config.enable_log_file:
-            create_directory(config.log_file_path)
-            _logger.addHandler(
-                self.create_logger_file_handler(
-                    config.log_file_path,
-                    config.log_file_name,
-                    config.formatter
+            # check file handler exist -> replace or ignore 
+            found_file_handlers = []
+            for handler in _logger.handlers:
+                if isinstance(handler, logging.FileHandler):
+                    found_file_handlers.append(handler)
+            
+            if len(found_file_handlers) == 1:
+                # 1 file handler, check if need replace
+                if found_file_handlers[0].baseFilename != os.path.join(config.log_file_path, config.log_file_name):
+                    close_file_handler(found_file_handlers)
+                    _logger.handlers = []
+                    # create new file handler
+                    create_directory(config.log_file_path)
+                    _logger.addHandler(
+                        self.create_logger_file_handler(
+                            config.log_file_path,
+                            config.log_file_name,
+                            config.formatter
+                        )
+                    )
+            else:
+                if len(found_file_handlers) > 1:
+                    # close all, and replace by new file handler
+                    close_file_handler(found_file_handlers)
+                    _logger.handlers = []
+
+                # no file handler , add new file handler
+                create_directory(config.log_file_path)
+                _logger.addHandler(
+                    self.create_logger_file_handler(
+                        config.log_file_path,
+                        config.log_file_name,
+                        config.formatter
+                    )
                 )
-            )
         # enable debug mode
         if config.enable_debug:
             self.set_logger_debug_mode(True)

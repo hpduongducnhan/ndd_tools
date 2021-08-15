@@ -11,6 +11,41 @@ class Example:
     pass
 
 
+def test_logger_mixin_only_one_file_handler():
+    file_path = os.path.join(
+        os.getcwd(), 'log', 'test_only_file_handler'
+    )
+    config = LoggerConfig(
+        log_file_path=file_path,
+        enable_log_file=True
+    )
+    config2 = LoggerConfig(
+        log_file_path=file_path,
+        enable_log_file=True
+    )
+    class XYZ(Example, LoggerMixin):
+        def __init__(self, logger_config: LoggerConfig) -> None:
+            self.set_logger_up(logger_config)
+            super().__init__()
+        def run(self):
+            self.info('hello')
+    ix = XYZ(config)
+    ix.run()
+    iy = XYZ(config2)
+    iy.run()
+    print(ix.logger.handlers)
+    print(iy.logger.handlers)
+    file_handler_counter = 0
+    for handler in iy.logger.handlers:
+        if isinstance(handler, logging.FileHandler):
+            print(handler.baseFilename)
+            file_handler_counter += 1
+    
+    assert ix.logger.name == iy.logger.name
+    # same logger -> has only a file handler to write file
+    assert file_handler_counter == 1
+
+
 def test_logger_mixin_default_config():
     class X(Example, LoggerMixin):
         def __init__(self) -> None:
