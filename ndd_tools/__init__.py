@@ -6,7 +6,7 @@ from .data_models import LoggerConfig, ProxyModel, RequestResponse
 from .datetime_converter import str_to_datetime
 
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 
 __all__ = [
     'welcome',

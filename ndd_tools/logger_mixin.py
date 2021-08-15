@@ -137,6 +137,10 @@ class LoggerMixin:
         # enable debug mode
         if config.enable_debug:
             self.set_logger_debug_mode(True)
+
+        # propagate
+        _logger.propagate = config.propagate
+
         # add instance attribute
         config.logger = _logger
         setattr(self, LOGGER_CONFIG, config)
