@@ -18,6 +18,7 @@ def find_logger_handler_stream_stdout(handlers: List[logging.Handler]):
             found_handler.close()
             return found_handler
 
+
 def close_file_handler(handlers: List[logging.FileHandler]):
     for handler in handlers:
         handler.close()
@@ -99,12 +100,12 @@ class LoggerMixin:
             _logger.setLevel(config.level)
         # check if need add file handler
         if config.enable_log_file:
-            # check file handler exist -> replace or ignore 
+            # check file handler exist -> replace or ignore
             found_file_handlers = []
             for handler in _logger.handlers:
                 if isinstance(handler, logging.FileHandler):
                     found_file_handlers.append(handler)
-            
+
             if len(found_file_handlers) == 1:
                 # 1 file handler, check if need replace
                 if found_file_handlers[0].baseFilename != os.path.join(config.log_file_path, config.log_file_name):

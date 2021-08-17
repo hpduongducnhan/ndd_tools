@@ -20,7 +20,6 @@ class ApiClient(LoggerMixin):
         # inherit logger or default logger
         self.set_logger_up(kwargs.get(KW_LOGGER_CONFIG))
 
-
         if disable_ssl_warning:
             self.logger.debug('disable InsecureRequestWarning')
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

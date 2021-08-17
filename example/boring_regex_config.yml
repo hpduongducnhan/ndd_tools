@@ -1,0 +1,65 @@
+# field: access path of json data
+#     _ if field has [...] -> return type must be list
+#     _ otherwise return type depend on strategy of regex
+# output key: result with key: value
+# output strategy: value type
+#     + search :  return first of matching strings 
+#     + findall:  returns a list of matching strings.
+#     + finditer:
+#     + match: 
+#
+# output patterns group_type:
+#     + group   -> Returns one or more subgroups
+#     + groups  -> Return a tuple containing all the subgroups of the match
+#     + groupdict -> Return a dictionary containing all the named subgroups of the match, keyed by the subgroup name
+#         m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Malcolm Reynolds").groupdict()
+#         --> {'first_name': 'Malcolm', 'last_name': 'Reynolds'}
+version: "1.0.0"
+name: ""
+description: ""
+config:
+  FTS_1220_check_sw_huawei_temp: 
+    result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(T\d+): (\d+C)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["services", 0, "output"]
+        key: 'card_name'
+        strategy: "search"
+        patterns:
+          - {value: '(T\\d*):\\s+(\\d+\\.?\\d*)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'province'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'branch'
+        strategy: "search"
+        patterns:
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'pop_name'
+        strategy: "search"
+        patterns:
+          - {value: 'HCM([A-Z]{1,}\\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["alias"]
+        key: 'module_device'
+        strategy: "search"
+        patterns:
+          - {value: '(Huawei\s\w+)', group_type: "group", group_indexes: [1]}

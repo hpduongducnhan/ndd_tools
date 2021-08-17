@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+import enum
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, validator
 from .data_model_validators import LoggerFieldType
 from .constants import LOGGER_FORMATTER
@@ -57,3 +58,55 @@ class RequestResponse(BaseModel):
     data: Any = None
     code: int = 0
     message: Optional[str]
+
+
+# -------------------------------------------------
+#   For Boring Regex
+#
+class EnumStrategy(enum.Enum):
+    MATCH = 'match'
+    SEARCH = 'search'
+    FINDALL = 'findall'
+    FINDITER = 'finditer'
+
+
+class EnumGroupType(enum.Enum):
+    GROUP = "group"
+    GROUPS = "groups"
+    GROUPDICT = "groupdict"
+
+
+class BRInputDataModel(BaseModel):
+    pass
+
+
+class BRConfigModel(BaseModel):
+    file_path: str
+    config: Optional[Dict]
+    logger_config: LoggerConfig = LoggerConfig()
+
+
+class RegexPatternModel(BaseModel):
+    value: str
+    group_type: EnumGroupType
+    group_indexes: Optional[List[int]]
+
+
+class RegexFieldModel(BaseModel):
+    active: bool = True
+    field: List[Any]
+    key: str
+    strategy: EnumStrategy
+    patterns: List[RegexPatternModel]
+
+
+class RegexConfig(BaseModel):
+    result_keys: List[str]
+    regex_fields: List[RegexFieldModel]
+
+
+class BoringRegexConfiguration(BaseModel):
+    version: str
+    name: str
+    description: str
+    config: Dict[str, RegexConfig]

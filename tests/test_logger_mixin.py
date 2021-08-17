@@ -11,6 +11,39 @@ class Example:
     pass
 
 
+def test_logger_mixin_propagate():
+    file_path = os.path.join(
+        os.getcwd(), 'log', 'test_only_file_handler'
+    )
+    config = LoggerConfig(
+        log_file_path=file_path,
+        enable_log_file=True
+    )
+
+    class XYZZ(Example, LoggerMixin):
+        def __init__(self, **kwargs) -> None:
+            self.set_logger_up(kwargs.get('logger_config'))
+            super().__init__()
+
+    class XYZ(Example, LoggerMixin):
+        def __init__(self, logger_config: LoggerConfig) -> None:
+            self.set_logger_up(logger_config)
+            super().__init__()
+
+        def run(self):
+            self.info('hello')
+
+        def test_logger_config(self):
+            x = XYZZ(logger_config=self.logger_config)
+            print('test_logger_config', x.logger.propagate)
+            assert x.logger.propagate is False
+
+    ix = XYZ(config)
+    ix.run()
+    assert ix.logger_config.propagate is False
+    ix.test_logger_config()
+
+
 def test_logger_mixin_only_one_file_handler():
     file_path = os.path.join(
         os.getcwd(), 'log', 'test_only_file_handler'
@@ -23,10 +56,12 @@ def test_logger_mixin_only_one_file_handler():
         log_file_path=file_path,
         enable_log_file=True
     )
+
     class XYZ(Example, LoggerMixin):
         def __init__(self, logger_config: LoggerConfig) -> None:
             self.set_logger_up(logger_config)
             super().__init__()
+
         def run(self):
             self.info('hello')
     ix = XYZ(config)
@@ -40,7 +75,7 @@ def test_logger_mixin_only_one_file_handler():
         if isinstance(handler, logging.FileHandler):
             print(handler.baseFilename)
             file_handler_counter += 1
-    
+
     assert ix.logger.name == iy.logger.name
     # same logger -> has only a file handler to write file
     assert file_handler_counter == 1

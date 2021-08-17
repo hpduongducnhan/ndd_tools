@@ -2,11 +2,12 @@
 from .welcome import welcome
 from .logger_mixin import LoggerMixin
 from .api_client import ApiClient
-from .data_models import LoggerConfig, ProxyModel, RequestResponse
+from .data_models import LoggerConfig, ProxyModel, RequestResponse, BRConfigModel
 from .datetime_converter import str_to_datetime
+from .boring_regex import BoringRegex
 
 
-__version__ = "1.0.9"
+__version__ = "1.1.0"
 
 __all__ = [
     'welcome',
@@ -15,5 +16,7 @@ __all__ = [
     'LoggerConfig',
     'ProxyModel',
     'RequestResponse',
-    'str_to_datetime'
+    'str_to_datetime',
+    'BoringRegex',
+    'BRConfigModel'
 ]
