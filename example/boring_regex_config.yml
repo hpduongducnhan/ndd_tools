@@ -20,6 +20,7 @@ description: ""
 config:
   FTS_1220_check_sw_huawei_temp: 
     result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device"]
+    0asd.asdasd.asx: asd
     regex_fields:
       - active: true
         field: ["services", 0, "output"]

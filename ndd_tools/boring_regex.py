@@ -94,7 +94,7 @@ class BoringRegex(LoggerMixin):
         result = {}
         for field in config.regex_fields:
             source_strings = self.find_field_values(field.field, data)
-            print('source', source_strings)
+            # print('source', source_strings)
             result[field.key] = [self.handle_strategy(source, field) for source in source_strings]
         return result
 
@@ -113,9 +113,9 @@ class BoringRegex(LoggerMixin):
                 pass
 
     def _execute_search(self, data: str, patterns: List[RegexPatternModel]):
-        print('_execute_search', data)
+        # print('_execute_search', data)
         for pattern in patterns:
-            print('_execute_search', pattern)
+            # print('_execute_search', pattern)
             try:
                 result = re.search(r'%s' % pattern.value, data, flags=re.I)
                 print('_execute_search result', result)
@@ -133,13 +133,14 @@ class BoringRegex(LoggerMixin):
             except IndexError as e:
                 raise e
             except Exception as e:
-                print('get exception ', e)
+                # print('get exception ', e)
+                pass
 
     def _execute_findall(self, data: str, patterns: List[RegexPatternModel]):
-        print('_execute_findall', data)
+        # print('_execute_findall', data)
         for pattern in patterns:
             try:
-                print('_execute_findall pattern ', pattern)
+                # print('_execute_findall pattern ', pattern)
                 return re.findall(r'%s' % pattern.value, data, flags=re.I)
             except IndexError as e:
                 raise e
