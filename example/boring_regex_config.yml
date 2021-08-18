@@ -14,13 +14,107 @@
 #     + groupdict -> Return a dictionary containing all the named subgroups of the match, keyed by the subgroup name
 #         m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Malcolm Reynolds").groupdict()
 #         --> {'first_name': 'Malcolm', 'last_name': 'Reynolds'}
+
 version: "1.0.0"
 name: ""
 description: ""
 config:
-  FTS_1220_check_sw_huawei_temp: 
+  FTN_1429_09.0_IPMS_OUTDOOR_TEMPERATURE:
+    result_keys: ["temp", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(TEMP):(\d+)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+
+  FTN_1429_07.0_IPMS_INDOOR_TEMPERATURE_2:
+    result_keys: ["temp", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(T\d+) (\d+)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: [name]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      
+  FTN_1429_08.0_IPMS_INDOOR_HUMIDITY:
+    result_keys: ["humidity", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "humidity"
+        strategy: "findall"
+        patterns: 
+          - {value: '(HUMIDITY):(\d+)%', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+
+  FTN_1197_check_sw_temperature_dasan:
     result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device"]
-    0asd.asdasd.asx: asd
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(T \d+): (\d+)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["services", 0, "output"]
+        key: 'card_name'
+        strategy: "search"
+        patterns:
+          - {value: '(T \d*):\s*\d+', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'province'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'branch'
+        strategy: "search"
+        patterns:
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'pop_name'
+        strategy: "search"
+        patterns:
+          - {value: 'HNI([A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["alias"]
+        key: 'module_device'
+        strategy: "search"
+        patterns:
+          - {value: '(DASAN\s\w+)', group_type: "group", group_indexes: [1]}
+      
+  FTN_1201_check_sw_huawei_temp:
+    result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device"]
     regex_fields:
       - active: true
         field: ["services", 0, "output"]
@@ -33,7 +127,70 @@ config:
         key: 'card_name'
         strategy: "search"
         patterns:
-          - {value: '(T\\d*):\\s+(\\d+\\.?\\d*)', group_type: "group", group_indexes: [1]}
+          - {value: '(T\d*):\s+(\d+\.?\d*)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'province'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'branch'
+        strategy: "search"
+        patterns:
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HNI[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'pop_name'
+        strategy: "search"
+        patterns:
+          - {value: 'HNI([A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["alias"]
+        key: 'module_device'
+        strategy: "search"
+        patterns:
+          - {value: '(Huawei\s\w+)', group_type: "group", group_indexes: [1]}
+      
+  FTN_1205_1.INF_Power_Status:
+    result_keys: ["temp", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(Temp)=(\d+\.?\d*)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["services", 0, "output"]
+        key: 'card_name'
+        strategy: "search"
+        patterns:
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
+      
+
+  FTS_1214_check_sw_huawei_temp: 
+    result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(T\d+):\s+(\d+)C', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["services", 0, "output"]
+        key: 'card_name'
+        strategy: "search"
+        patterns:
+          - {value: '(T\d*):\s+(\d+\.?\d*)', group_type: "group", group_indexes: [1]}
       - active: true
         field: ["name"]
         key: 'province'
@@ -51,16 +208,195 @@ config:
         key: 'location'
         strategy: "search"
         patterns:
-          - {value: '(HCM[A-Z]{1,}\\d{3})', group_type: "group", group_indexes: [1]}
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
       - active: true
         field: ["name"]
         key: 'pop_name'
         strategy: "search"
         patterns:
-          - {value: 'HCM([A-Z]{1,}\\d{3})', group_type: "group", group_indexes: [1]}
+          - {value: 'HCM([A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
       - active: true
         field: ["alias"]
         key: 'module_device'
         strategy: "search"
         patterns:
           - {value: '(Huawei\s\w+)', group_type: "group", group_indexes: [1]}
+      
+  FTS_1220_check_sw_huawei_temp: 
+    result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device", "state"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "state"
+        strategy: "getall"
+        patterns: 
+          - {value: '', group_type: "group", group_indexes: []}
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(T\d+):\s+(\d+)C', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["services", 0, "output"]
+        key: 'card_name'
+        strategy: "search"
+        patterns:
+          - {value: '(T\d*):\s+(\d+\.?\d*)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'province'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'branch'
+        strategy: "search"
+        patterns:
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'pop_name'
+        strategy: "search"
+        patterns:
+          - {value: 'HCM([A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["alias"]
+        key: 'module_device'
+        strategy: "search"
+        patterns:
+          - {value: '(Huawei\s\w+)', group_type: "group", group_indexes: [1]}
+      
+  FTS_1229_1.INF_Power_Status:
+    result_keys: ["temp", "card_name", "province", "branch", "location", "pop_name", "module_device"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(Temp)=(\d+\.?\d*)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["services", 0, "output"]
+        key: 'card_name'
+        strategy: "search"
+        patterns:
+          - {value: '(T\d*):\s+(\d+\.?\d*)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'province'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM)', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'branch'
+        strategy: "search"
+        patterns:
+          - {value: '(\w*[0-9])\-\w+\d', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["name"]
+        key: 'pop_name'
+        strategy: "search"
+        patterns:
+          - {value: 'HCM([A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      - active: true
+        field: ["alias"]
+        key: 'module_device'
+        strategy: "search"
+        patterns:
+          - {value: '(Enatel..U)', group_type: "group", group_indexes: [1]}
+      
+  FTS_1161_09.0_IPMS_V2_OUTDOOR_TEMPERATURE:
+    result_keys: ["temp", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(TEMP):(\d+\.?\d*)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      
+  FTS_1161_07.0_IPMS_V2_INDOOR_TEMPERATURE_1:
+    result_keys: ["temp", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: '(T\d*):(\d+\.?\d*)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      
+  FTS_1161_08.0_IPMS_V2_INDOOR_HUMIDITY:
+    result_keys: ["humidity", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "humidity"
+        strategy: "findall"
+        patterns: 
+          - {value: '(HUMIDITY).*:(\d+\.?\d*)%', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      
+  FTS_1161_05.0_OPMS_INDOOR_HUMIDITY:
+    result_keys: ["humidity", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "humidity"
+        strategy: "findall"
+        patterns: 
+          - {value: '(HUMIDITY).*:(\d+\.?\d*)%', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      
+  FTS_1161_04.0_OPMS_Temprature:
+    result_keys: ["temp", "location"]
+    regex_fields:
+      - active: true
+        field: ["services", 0, "output"]
+        key: "temp"
+        strategy: "findall"
+        patterns: 
+          - {value: 'CABINET_(TEMP)\(Khoang_Thiet_Bi\)\:(\d+\.?\d*)', group_type: "group", group_indexes: [0]}
+      - active: true
+        field: ["name"]
+        key: 'location'
+        strategy: "search"
+        patterns:
+          - {value: '(HCM[A-Z]{1,}\d{3})', group_type: "group", group_indexes: [1]}
+      

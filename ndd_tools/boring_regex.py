@@ -5,9 +5,9 @@ import json
 from ndd_tools.data_models import BRConfigModel, BoringRegexConfiguration, RegexConfig, RegexFieldModel, RegexPatternModel
 from ndd_tools.data_models import EnumStrategy, EnumGroupType
 from .logger_mixin import LoggerMixin
+from .constants import ARRAY_FIELD
 
 
-ARRAY_FIELD = "[...]"
 
 
 class BoringRegex(LoggerMixin):
@@ -19,7 +19,7 @@ class BoringRegex(LoggerMixin):
     def load_config_file(self, file_path: str) -> BoringRegexConfiguration:
         with open(file_path, 'r') as f:
             data = yaml.safe_load(f)
-            print(data)
+            # print(data)
             return BoringRegexConfiguration.parse_obj(data)
 
     def _get_data_of_path(self, current_path: List[str], input_data: Dict):
@@ -76,6 +76,9 @@ class BoringRegex(LoggerMixin):
     def handle_strategy(self, source: str, field_conf: RegexFieldModel):
         # print('handle source ', source, ' with ', field_conf)
         # return "OK, i hope so"
+        if field_conf.strategy == EnumStrategy.GETALL:
+            return {'result': source, 'source': source}
+
         if field_conf.strategy == EnumStrategy.MATCH:
             return {'result': self._execute_match(source, field_conf.patterns), 'source': source}
 
@@ -118,7 +121,7 @@ class BoringRegex(LoggerMixin):
             # print('_execute_search', pattern)
             try:
                 result = re.search(r'%s' % pattern.value, data, flags=re.I)
-                print('_execute_search result', result)
+                # print('_execute_search result', result)
                 if pattern.group_type == EnumGroupType.GROUPDICT:
                     return [i.groupdict() for i in result]
                 if pattern.group_type == EnumGroupType.GROUP:

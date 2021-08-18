@@ -12,3 +12,6 @@ DATETIME_FORMATS = (
     "%Y-%m-%dT%H:%M:%S.%f",
     "%Y-%m-%dT%H:%M:%S.%fZ"
 )
+
+
+ARRAY_FIELD = "[...]"

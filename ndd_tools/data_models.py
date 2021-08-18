@@ -68,6 +68,7 @@ class EnumStrategy(enum.Enum):
     SEARCH = 'search'
     FINDALL = 'findall'
     FINDITER = 'finditer'
+    GETALL = 'getall'
 
 
 class EnumGroupType(enum.Enum):

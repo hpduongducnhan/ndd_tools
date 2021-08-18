@@ -25,6 +25,11 @@ def close_file_handler(handlers: List[logging.FileHandler]):
 
 
 class LoggerMixin:
+    def close(self):
+        for handler in self.logger.handlers:
+            handler.close()
+        self.logger.handlers = []
+
     def set_logger_debug_mode(self, mode: bool) -> None:
         if mode:
             self.set_logger_level(logging.DEBUG)

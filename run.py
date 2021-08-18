@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
-from typing import List
-from tests.test_api_client import test_api_client_with_debug
-from tests.test_logger_mixin import test_logger_mixin_propagate
-from ndd_tools import LoggerConfig, data_models
+import json
+import sys
+from ndd_tools import boring_regex
 from ndd_tools.boring_regex import BoringRegex, BRConfigModel
 
 
@@ -70,6 +69,21 @@ def test_boring_regex():
         'FTS_1220_check_sw_huawei_temp'
     )
 
+def handle_boring_regex():
+    client = BoringRegex(
+        BRConfigModel(file_path=os.path.join(os.getcwd(), 'example', 'boring_regex_config.yml'))
+    )
+    with open(
+        os.path.join(os.getcwd(), 'example', 'boring_regex_data.json'), 'r'
+    ) as f:
+        data = json.load(f)
+    
+    for item in data['list']:
+        result = client.run(item, 'FTS_1220_check_sw_huawei_temp')
+        print(result)
+        sys.exit()
+
+
 
 if __name__ == '__main__':
-    test_boring_regex()
+    handle_boring_regex()

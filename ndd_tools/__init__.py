@@ -7,7 +7,7 @@ from .datetime_converter import str_to_datetime
 from .boring_regex import BoringRegex
 
 
-__version__ = "1.1.0"
+__version__ = "1.1.2"
 
 __all__ = [
     'welcome',
