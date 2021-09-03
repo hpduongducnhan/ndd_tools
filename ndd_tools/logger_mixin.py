@@ -191,3 +191,59 @@ class LoggerMixin:
     def stack_trace(self, msg: str, error: any):
         self.error(msg)
         self.logger.exception(error)
+
+
+
+def setup_logger(
+    name: str, 
+    debug: bool = False,
+    propagate: bool = False,
+    file_path: str = None,
+    level=logging.INFO,
+    logger_formatter: str = '%(asctime)s [%(levelname)s]: %(message)s'
+) -> logging.Logger:
+    logger = logging.getLogger(name)
+    logger.level = level
+    logger.propagate = propagate
+
+    # add file handler
+    if file_path:
+        if not os.path.isdir(file_path):
+            os.makedirs(file_path)
+
+        file_log = os.path.join(file_path, f'{name}.log')
+        # new file handler
+        file_handler = logging.FileHandler(file_log)
+        file_handler.setFormatter(logging.Formatter(logger_formatter))
+
+        # remove old file handler
+        found_file_handlers = []
+        for handler in logger.handlers:
+            if isinstance(handler, logging.FileHandler):
+                found_file_handlers.append(handler)
+
+        if len(found_file_handlers) == 1:
+            if found_file_handlers[0].baseFilename != file_log:
+                for handler in logger.handlers:
+                    handler.close()
+                logger.handlers = []
+                logger.addHandler(file_handler)
+        else:
+            if len(found_file_handlers) > 1:
+                logger.handlers = []
+            logger.addHandler(file_handler)
+
+    # stream log to console
+    if debug:
+        found_stdout_handler = []
+        for handler in logger.handlers:
+            if isinstance(handler, logging.StreamHandler) and handler.stream is sys.stdout:
+                found_stdout_handler.append(handler)
+        if len(found_stdout_handler) >= 1:
+            for handler in found_stdout_handler:
+                handler.close()
+                logger.removeHandler(handler)
+        logger.addHandler(logging.StreamHandler(sys.stdout))
+        logger.level = logging.DEBUG
+
+    return logger

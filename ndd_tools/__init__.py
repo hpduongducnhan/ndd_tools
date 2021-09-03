@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from .welcome import welcome
-from .logger_mixin import LoggerMixin
+from .logger_mixin import LoggerMixin, setup_logger
 from .api_client import ApiClient
 from .data_models import LoggerConfig, ProxyModel, RequestResponse, BRConfigModel
 from .datetime_converter import str_to_datetime
 from .boring_regex import BoringRegex
 
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 __all__ = [
     'welcome',
@@ -18,5 +18,6 @@ __all__ = [
     'RequestResponse',
     'str_to_datetime',
     'BoringRegex',
-    'BRConfigModel'
+    'BRConfigModel',
+    'setup_logger'
 ]

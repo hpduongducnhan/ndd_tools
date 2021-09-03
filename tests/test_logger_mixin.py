@@ -2,13 +2,38 @@
 import logging
 import os
 import sys
-from ndd_tools.logger_mixin import LoggerMixin
+from ndd_tools.logger_mixin import LoggerMixin, setup_logger
 from ndd_tools.data_models import LoggerConfig
 from ndd_tools.constants import LOGGER_CONFIG
 
 
 class Example:
     pass
+
+
+def test_setup_logger_without_file_handler():
+    logger = setup_logger('test_setup_logger_without_file_handler')
+    assert logger.propagate is False
+    assert logger.handlers == []
+
+
+def test_setup_logger_with_file_handler():
+    file_path = os.path.join(os.getcwd(), 'log')
+    name = 'test_setup_logger_with_file_handler'
+    log_file = os.path.join(file_path, name + '.log')
+    if not os.path.isdir(file_path):
+        os.makedirs(file_path)
+
+    logger = setup_logger(name, file_path=file_path, propagate=True, debug=True)
+    assert logger.propagate is True
+    assert os.path.isfile(log_file)
+    assert len(logger.handlers) == 2
+
+    # remove test file
+    for handler in logger.handlers:
+        handler.close()
+    del logger
+    os.remove(log_file)
 
 
 def test_logger_mixin_propagate():

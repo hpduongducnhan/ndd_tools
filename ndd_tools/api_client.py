@@ -25,7 +25,7 @@ class ApiClient(LoggerMixin):
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         if proxy:
-            self.logger.info(f'add proxy {proxy}')
+            self.logger.debug(f'add proxy {proxy}')
             add_proxy(proxy)
         self.config: ApiClientConfig = load_config(config_file_path)
         self.logger.debug(f'config file -> {self.config}')
