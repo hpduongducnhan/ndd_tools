@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 from typing import Dict
 import requests
 import json
@@ -29,6 +30,10 @@ class ApiClient(LoggerMixin):
             add_proxy(proxy)
         self.config: ApiClientConfig = load_config(config_file_path)
         self.logger.debug(f'config file -> {self.config}')
+
+    def set_logger(self, logger):
+        if not isinstance(logger, logging.Logger):
+            raise TypeError(f'expect {logger} type is an instance of logging.Logger')
 
     def _remove_allow_duplicated_string(self, key: str):
         while key.startswith('*'):

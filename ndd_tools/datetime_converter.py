@@ -2,7 +2,11 @@
 from typing import Union
 from datetime import datetime
 from .constants import DATETIME_FORMATS
+from dateutil import tz
 
+
+def get_now_with_tz(zone: str = "Asia/Ho_Chi_Minh", str_format="%Y-%m-%d %H:%M:%S %z") -> str:
+    return datetime.utcnow().astimezone(tz.gettz(zone)).strftime(str_format)
 
 def str_to_datetime(target: Union[str, datetime]):
     if isinstance(target, datetime):
