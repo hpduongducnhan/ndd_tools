@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
-from typing import Dict
+from typing import Dict, Type
 import requests
 import json
 import urllib3
+import os
 from .others import load_config, add_proxy
 from .data_models import ProxyModel, TargetAPI, RequestResponse, ApiClientConfig, LoggerConfig
 from .logger_mixin import LoggerMixin
@@ -13,7 +14,8 @@ from .constants import KW_LOGGER_CONFIG
 class ApiClient(LoggerMixin):
     def __init__(
         self,
-        config_file_path: str,
+        config: ApiClientConfig = None,
+        config_file_path: str = None,
         proxy: ProxyModel = None,
         disable_ssl_warning=True,
         **kwargs
@@ -28,12 +30,28 @@ class ApiClient(LoggerMixin):
         if proxy:
             self.logger.debug(f'add proxy {proxy}')
             add_proxy(proxy)
-        self.config: ApiClientConfig = load_config(config_file_path)
-        self.logger.debug(f'config file -> {self.config}')
+
+        if not isinstance(config, ApiClientConfig):
+            raise TypeError(f'expect config is intance of {ApiClientConfig}')
+
+        self.config_file_path = config_file_path
+        self.config = config
 
     def set_logger(self, logger):
         if not isinstance(logger, logging.Logger):
             raise TypeError(f'expect {logger} type is an instance of logging.Logger')
+
+    def set_config(self, config: ApiClientConfig):
+        if not isinstance(config, ApiClientConfig):
+            raise TypeError(f'expect config is intance of {ApiClientConfig}')
+        self.config = config
+
+    def set_config_file_path(self, config_file_path: str):
+        if not os.path.isfile(config_file_path):
+            raise ValueError(f'config_file_path must be an os.path string')
+        if not config_file_path.endswith('.json'):
+            raise TypeError(f'only support json config file')
+        self.config_file_path = config_file_path
 
     def _remove_allow_duplicated_string(self, key: str):
         while key.startswith('*'):
@@ -50,12 +68,21 @@ class ApiClient(LoggerMixin):
         self.logger.debug(f'make url result -> {url}')
         return url
 
+    def _load_config(self):
+        try:
+            self.config: ApiClientConfig = load_config(self.config_file_path)
+        except Exception as e:
+            raise ValueError(f'config file not found or config object not set, use set_config method or set_config_file_path first')
+
     def make_request(
         self,
         target_name: str,
         headers: Dict = None,
         parameters: Dict = None
     ) -> RequestResponse:
+        if not self.config:
+            self._load_config()
+
         target: TargetAPI = self.config.config.get(target_name)
         if not target:
             self.logger.error(f'not config for api endpoint -> {target_name}')
