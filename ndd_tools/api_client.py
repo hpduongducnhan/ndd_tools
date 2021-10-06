@@ -31,9 +31,6 @@ class ApiClient(LoggerMixin):
             self.logger.debug(f'add proxy {proxy}')
             add_proxy(proxy)
 
-        if not isinstance(config, ApiClientConfig):
-            raise TypeError(f'expect config is intance of {ApiClientConfig}')
-
         self.config_file_path = config_file_path
         self.config = config
 
