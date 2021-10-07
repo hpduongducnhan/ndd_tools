@@ -2,19 +2,20 @@
 from .welcome import welcome
 from .logger_mixin import LoggerMixin, setup_logger
 from .api_client import ApiClient
-from .data_models import LoggerConfig, ProxyModel, RequestResponse, BRConfigModel
+from .data_models import LoggerConfig, ProxyModel, RequestResponse, BRConfigModel, ApiClientConfig
 from .datetime_converter import str_to_datetime
 from .boring_regex import BoringRegex
 from .regex_executor import RegexExecutor, load_regex_config_file
 from .schemas import RegexExecutorConfig
 
 
-__version__ = "1.1.7"
+__version__ = "1.1.8"
 
 __all__ = [
     'welcome',
     'LoggerMixin',
     'ApiClient',
+    'ApiClientConfig',
     'LoggerConfig',
     'ProxyModel',
     'RequestResponse',
