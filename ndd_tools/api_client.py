@@ -33,6 +33,8 @@ class ApiClient(LoggerMixin):
 
         self.config_file_path = config_file_path
         self.config = config
+        if self.config_file_path and not self.config:
+            self._load_config()
 
     def set_logger(self, logger):
         if not isinstance(logger, logging.Logger):
@@ -49,6 +51,7 @@ class ApiClient(LoggerMixin):
         if not config_file_path.endswith('.json'):
             raise TypeError(f'only support json config file')
         self.config_file_path = config_file_path
+        self._load_config()
 
     def _remove_allow_duplicated_string(self, key: str):
         while key.startswith('*'):

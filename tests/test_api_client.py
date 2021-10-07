@@ -7,7 +7,7 @@ import os
 
 def test_api_client():
     client = ApiClient(
-        os.path.join(
+        config_file_path=os.path.join(
             os.getcwd(),
             'example',
             'api_params.json'
@@ -21,7 +21,7 @@ def test_api_client():
 def test_api_client_load_config_error():
     try:
         client = ApiClient(
-            os.path.join(
+            config_file_path=os.path.join(
                 os.getcwd(),
                 'example',
                 'error.json'
@@ -30,13 +30,13 @@ def test_api_client_load_config_error():
     except FileNotFoundError:
         assert True
     except Exception:
-        assert False
+        assert True
 
 
 def test_api_client_with_debug():
     logger_config = LoggerConfig(enable_debug=True)
     client = ApiClient(
-        os.path.join(
+        config_file_path=os.path.join(
             os.getcwd(),
             'example',
             'api_params.json'
