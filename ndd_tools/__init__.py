@@ -5,11 +5,11 @@ from .api_client import ApiClient
 from .data_models import LoggerConfig, ProxyModel, RequestResponse, BRConfigModel, ApiClientConfig
 from .datetime_converter import str_to_datetime
 from .boring_regex import BoringRegex
-from .regex_executor import RegexExecutor, load_regex_config_file
+from .regex_executor import RegexExecutor, load_regex_config_file, RegexResult
 from .schemas import RegexExecutorConfig
 
 
-__version__ = "1.1.8"
+__version__ = "1.2.0"
 
 __all__ = [
     'welcome',
@@ -24,6 +24,7 @@ __all__ = [
     'BRConfigModel',
     'setup_logger',
     'RegexExecutor',
+    'RegexResult',
     'RegexExecutorConfig',
     'load_regex_config_file'
 ]

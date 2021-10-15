@@ -1,7 +1,9 @@
 import os
 import yaml
 import re
-from typing import List, Dict
+import json
+from typing import List, Dict, Optional, Union
+from pydantic import BaseModel
 from .validators import check_instance_of
 from .schemas import EnumStrategy, EnumGroupType
 from .schemas import RegexExecutorConfig, ObjectRegexConfig
@@ -14,6 +16,57 @@ def load_regex_config_file(file_path: str):
     with open(file_path, 'r') as f:
         data = yaml.safe_load(f)
         return RegexExecutorConfig.parse_obj(data)
+
+
+class RegexResult:
+
+    def __init__(self, result: dict[str, list[dict[str, Union[list, object]]]]) -> None:
+        if not isinstance(result, dict):
+            raise ValueError(f'result must be a dict')
+        # example:
+        # result = {
+        #   'key': {
+        #       'result': [],
+        #       'source': {<object>}
+        #   }
+        # }
+        self.result = result
+
+    def _validate_key(self, key):
+        if key not in self.result:
+            raise ValueError(f'key {key} is not exist')
+
+    def get(self, key: str, index: int = 0):
+        self._validate_key(key)
+
+        # index < 0 -> get all
+        if index < 0:
+            return self.result.get(key)[0].get('result')
+
+        result = self.result.get(key)[0].get('result')
+        if result:
+            if isinstance(result, list):
+                return result[index]
+            if isinstance(result, str):
+                print(result)
+                return None
+            
+
+    def detail(self, key: str):
+        self._validate_key(key)
+        return self.result.get(key)
+
+    def dict(self, detail=False):
+        if detail:
+            return self.result
+        else:
+            return {k: self.get(k) for k in self.result.keys()}
+
+    def json(self, detail=False):
+        if detail:
+            return json.dumps(self.result)
+        else:
+            return json.dumps(self.dict(detail))
 
 
 class RegexExecutor:
@@ -36,7 +89,7 @@ class RegexExecutor:
         check_instance_of(config, RegexExecutorConfig)
         self.config = config
 
-    def _load_config_from_file_path(self, file_path: str=None):
+    def _load_config_from_file_path(self, file_path: str = None):
         if not file_path:
             file_path = self.config_file_path
         return load_regex_config_file(file_path)
@@ -194,9 +247,9 @@ class RegexExecutor:
                 raise e
             except Exception as e:
                 pass
-    
+
     def run(self, input_data: dict, config_name: str):
         check_instance_of(input_data, dict)
         check_instance_of(config_name, str)
         config: ObjectRegexConfig = self.config.config.get(config_name)
-        return self.process_data(input_data, config)
+        return RegexResult(self.process_data(input_data, config))

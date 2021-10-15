@@ -24,7 +24,8 @@ def run(config_file, data_file: str):
         # print('----------------------------------------')
         # print(f'item -> {item}')
         print(f'response -> {response}')
-        result.append(response)
+        print(response.get('temp'))
+        result.append(response.dict())
 
     # save to file
 
