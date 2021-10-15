@@ -1,3 +1,4 @@
+from sys import flags
 from pydantic import BaseModel
 import enum
 from typing import List, Dict, Optional, Any
@@ -21,7 +22,7 @@ class EnumGroupType(enum.Enum):
 class ObjFieldPatternRegexConfig(BaseModel):
     value: str
     group_type: EnumGroupType
-    group_indexes: Optional[List[int]]
+    group_indexes: int
 
 
 class ObjFieldRegexConfig(BaseModel):
@@ -43,3 +44,9 @@ class RegexExecutorConfig(BaseModel):
     description: str
     author: Optional[str]
     config: Dict[str, ObjectRegexConfig]
+
+
+class RegexKeyResult(BaseModel):
+    result: Any
+    source: str
+    strategy: EnumStrategy

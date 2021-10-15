@@ -5,7 +5,7 @@ import json
 from typing import List, Dict, Optional, Union
 from pydantic import BaseModel
 from .validators import check_instance_of
-from .schemas import EnumStrategy, EnumGroupType
+from .schemas import EnumStrategy, EnumGroupType, RegexKeyResult
 from .schemas import RegexExecutorConfig, ObjectRegexConfig
 from .schemas import ObjFieldRegexConfig, ObjFieldPatternRegexConfig
 
@@ -19,15 +19,15 @@ def load_regex_config_file(file_path: str):
 
 
 class RegexResult:
-
-    def __init__(self, result: dict[str, list[dict[str, Union[list, object]]]]) -> None:
+    def __init__(self, result: dict[str, RegexKeyResult]) -> None:
         if not isinstance(result, dict):
             raise ValueError(f'result must be a dict')
         # example:
         # result = {
         #   'key': {
-        #       'result': [],
-        #       'source': {<object>}
+        #       'result': Any,
+        #       'source': str,
+        #       'strategy': Enum
         #   }
         # }
         self.result = result
@@ -36,21 +36,9 @@ class RegexResult:
         if key not in self.result:
             raise ValueError(f'key {key} is not exist')
 
-    def get(self, key: str, index: int = 0):
-        self._validate_key(key)
-
-        # index < 0 -> get all
-        if index < 0:
-            return self.result.get(key)[0].get('result')
-
-        result = self.result.get(key)[0].get('result')
-        if result:
-            if isinstance(result, list):
-                return result[index]
-            if isinstance(result, str):
-                print(result)
-                return None
-            
+    def get(self, key: str):
+        self._validate_key(key)  
+        return self.result.get(key).result
 
     def detail(self, key: str):
         self._validate_key(key)
@@ -135,32 +123,55 @@ class RegexExecutor:
         return result_paths
 
     def find_field_values(self, access_path: List[str], input_data: Dict) -> List[str]:
-        paths = self.build_field_paths(access_path, input_data)
-        final_result = []
-        for path in paths:
-            temp_result = input_data
-            for item in path:
-                temp_result = temp_result[item]
-            final_result.append(temp_result)
-        return final_result
+        # paths = self.build_field_paths(access_path, input_data)
+        result = input_data
+        try:
+            for item in access_path:
+                result = result[item]
+            return result
+        except IndexError:
+            return None
+
+    def make_strategy_handler_result(self, result, source, strategy):
+        return RegexKeyResult(result=result, source=source, strategy=strategy)
 
     def handle_strategy(self, source: str, field_conf: ObjFieldRegexConfig):
         # print('handle source ', source, ' with ', field_conf)
         # return "OK, i hope so"
         if field_conf.strategy == EnumStrategy.GETALL:
-            return {'result': source, 'source': source}
+            # result is string
+            return self.make_strategy_handler_result(
+                source, source, EnumStrategy.GETALL.value
+            )
 
         if field_conf.strategy == EnumStrategy.MATCH:
-            return {'result': self._execute_match(source, field_conf.patterns), 'source': source}
+            # return string or list string
+            return self.make_strategy_handler_result(
+                self._execute_match(source, field_conf.patterns),
+                source, 
+                EnumStrategy.MATCH.value
+            ) 
 
         if field_conf.strategy == EnumStrategy.SEARCH:
-            return {'result': self._execute_search(source, field_conf.patterns), 'source': source}
+            return self.make_strategy_handler_result(
+                self._execute_search(source, field_conf.patterns),
+                source, 
+                EnumStrategy.SEARCH.value
+            ) 
 
         if field_conf.strategy == EnumStrategy.FINDALL:
-            return {'result': self._execute_findall(source, field_conf.patterns), 'source': source}
+            return self.make_strategy_handler_result(
+                self._execute_findall(source, field_conf.patterns),
+                source, 
+                EnumStrategy.FINDALL.value
+            ) 
 
         if field_conf.strategy == EnumStrategy.FINDITER:
-            return {'result': self._execute_finditer(source, field_conf.patterns), 'source': source}
+            return self.make_strategy_handler_result(
+                self._execute_finditer(source, field_conf.patterns),
+                source, 
+                EnumStrategy.FINDITER.value
+            ) 
 
         raise ValueError('strategy must provide')
 
@@ -169,9 +180,11 @@ class RegexExecutor:
         check_instance_of(config, ObjectRegexConfig)
         result = {}
         for field in config.regex_fields:
-            source_strings = self.find_field_values(field.field, data)
-            # print('source', source_strings)
-            result[field.key] = [self.handle_strategy(source, field) for source in source_strings]
+            source_string = self.find_field_values(field.field, data)
+            if source_string:
+                result[field.key] = self.handle_strategy(source_string, field)
+            else:
+                result[field.key] = None
         return result
 
     def _validate_before_execute(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
@@ -185,68 +198,45 @@ class RegexExecutor:
         for pattern in patterns:
             try:
                 result = re.match(r'%s' % pattern.value, data, flags=re.I)
+                if not result:
+                    continue
                 if pattern.group_type == EnumGroupType.GROUPDICT:
-                    return [i.groupdict() for i in result]
+                    return result.groupdict()
                 if pattern.group_type == EnumGroupType.GROUP:
-                    return "finditer not support group yet"
+                    return result.group(pattern.group_indexes)
                 if pattern.group_type == EnumGroupType.GROUPS:
-                    return "finditer not support groups yet"
+                    return result.groups()
 
             except Exception as e:
-                pass
+                print(f'execute match get exception {e}')
 
     def _execute_search(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
         self._validate_before_execute(data, patterns)
-        # print('_execute_search', data)
         for pattern in patterns:
-            # print('_execute_search', pattern)
             try:
                 result = re.search(r'%s' % pattern.value, data, flags=re.I)
-                # print('_execute_search result', result)
+                if not result:
+                    continue
                 if pattern.group_type == EnumGroupType.GROUPDICT:
-                    return [i.groupdict() for i in result]
+                    return result.groupdict()
                 if pattern.group_type == EnumGroupType.GROUP:
-                    _r = []
-                    for index in pattern.group_indexes:
-                        _r.append(result.group(index))
-                    if not _r:
-                        continue
-                    return _r
+                    return result.group(pattern.group_indexes)
                 if pattern.group_type == EnumGroupType.GROUPS:
                     return result.groups()
-            except IndexError as e:
-                raise e
             except Exception as e:
-                # print('get exception ', e)
-                pass
+                print(f'execute match get exception {e}')
 
     def _execute_findall(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
         self._validate_before_execute(data, patterns)
-        # print('_execute_findall', data)
         for pattern in patterns:
             try:
-                # print('_execute_findall pattern ', pattern)
                 return re.findall(r'%s' % pattern.value, data, flags=re.I)
-            except IndexError as e:
-                raise e
             except Exception as e:
-                pass
+                print(f'execute match get exception {e}')
 
     def _execute_finditer(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
         self._validate_before_execute(data, patterns)
-        for pattern in patterns:
-            try:
-                result = re.finditer(r'%s' % pattern.value, data, flags=re.I)
-                if pattern.group_type == EnumGroupType.GROUPDICT:
-                    return [i.groupdict() for i in result]
-                if pattern.group_type == EnumGroupType.GROUP:
-                    return "finditer not support group yet"
-                if pattern.group_type == EnumGroupType.GROUPS:
-                    return "finditer not support groups yet"
-            except IndexError as e:
-                raise e
-            except Exception as e:
-                pass
+        raise NotImplementedError('finditer is on working')
 
     def run(self, input_data: dict, config_name: str):
         check_instance_of(input_data, dict)

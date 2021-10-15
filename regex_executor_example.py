@@ -5,6 +5,7 @@
 import os
 import json
 import sys
+import re
 from ndd_tools import RegexExecutor, RegexExecutorConfig, load_regex_config_file
 
 
@@ -24,7 +25,7 @@ def run(config_file, data_file: str):
         # print('----------------------------------------')
         # print(f'item -> {item}')
         print(f'response -> {response}')
-        print(response.get('temp'))
+        print(response.get('name'))
         result.append(response.dict())
 
     # save to file
@@ -37,3 +38,7 @@ if __name__ == '__main__':
         os.path.join(os.getcwd(), 'example', 'boring_regex_config.yml'),
         'FTS_1214_check_sw_huawei_temp.json'
     )
+    # x = re.findall(r'(\w*[0-9])\-(\w+\d)', 'BTHT1-HCMB07001HW57-10.143.72.89')
+    # print(x)
+    # print(x.group(1))
+    # print(x.group(2))
