@@ -136,7 +136,7 @@ class RegexExecutor:
         try:
             return RegexKeyResult(result=result, source=source, strategy=strategy)
         except Exception as e:
-            print(f'RegexExecutor modeling result get exception {e}')
+            raise ValueError(f'RegexExecutor modeling result get exception {e} source {source}')
 
     def handle_strategy(self, source: str, field_conf: ObjFieldRegexConfig):
         # print('handle source ', source, ' with ', field_conf)
