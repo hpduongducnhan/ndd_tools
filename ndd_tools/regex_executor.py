@@ -233,7 +233,9 @@ class RegexExecutor:
         self._validate_before_execute(data, patterns)
         for pattern in patterns:
             try:
-                return re.findall(r'%s' % pattern.value, data, flags=re.I)
+                result = re.findall(r'%s' % pattern.value, data, flags=re.I)
+                if result:
+                    return result
             except Exception as e:
                 pass
 
