@@ -19,7 +19,7 @@ def load_regex_config_file(file_path: str):
 
 
 class RegexResult:
-    def __init__(self, result: dict[str, RegexKeyResult]) -> None:
+    def __init__(self, result: Dict[str, RegexKeyResult]) -> None:
         if not isinstance(result, dict):
             raise ValueError(f'result must be a dict')
         # example:
@@ -138,6 +138,9 @@ class RegexExecutor:
     def handle_strategy(self, source: str, field_conf: ObjFieldRegexConfig):
         # print('handle source ', source, ' with ', field_conf)
         # return "OK, i hope so"
+        if not source or not isinstance(source, str):
+            raise ValueError('get source from field fail, check xxx_config.yml')
+
         if field_conf.strategy == EnumStrategy.GETALL:
             # result is string
             return self.make_strategy_handler_result(
@@ -208,7 +211,7 @@ class RegexExecutor:
                     return result.groups()
 
             except Exception as e:
-                print(f'execute match get exception {e}')
+                pass
 
     def _execute_search(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
         self._validate_before_execute(data, patterns)
@@ -224,7 +227,7 @@ class RegexExecutor:
                 if pattern.group_type == EnumGroupType.GROUPS:
                     return result.groups()
             except Exception as e:
-                print(f'execute match get exception {e}')
+                pass
 
     def _execute_findall(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
         self._validate_before_execute(data, patterns)
@@ -232,7 +235,7 @@ class RegexExecutor:
             try:
                 return re.findall(r'%s' % pattern.value, data, flags=re.I)
             except Exception as e:
-                print(f'execute match get exception {e}')
+                pass
 
     def _execute_finditer(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
         self._validate_before_execute(data, patterns)
