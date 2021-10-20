@@ -133,7 +133,10 @@ class RegexExecutor:
             return None
 
     def make_strategy_handler_result(self, result, source, strategy):
-        return RegexKeyResult(result=result, source=source, strategy=strategy)
+        try:
+            return RegexKeyResult(result=result, source=source, strategy=strategy)
+        except Exception as e:
+            print(f'RegexExecutor modeling result get exception {e}')
 
     def handle_strategy(self, source: str, field_conf: ObjFieldRegexConfig):
         # print('handle source ', source, ' with ', field_conf)

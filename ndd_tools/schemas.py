@@ -48,5 +48,5 @@ class RegexExecutorConfig(BaseModel):
 
 class RegexKeyResult(BaseModel):
     result: Any
-    source: str
+    source: Optional[str]
     strategy: EnumStrategy
