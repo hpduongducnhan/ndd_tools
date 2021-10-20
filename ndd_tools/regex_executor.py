@@ -141,9 +141,6 @@ class RegexExecutor:
     def handle_strategy(self, source: str, field_conf: ObjFieldRegexConfig):
         # print('handle source ', source, ' with ', field_conf)
         # return "OK, i hope so"
-        if not source or not isinstance(source, str):
-            raise ValueError('get source from field fail, check xxx_config.yml')
-
         if field_conf.strategy == EnumStrategy.GETALL:
             # result is string
             return self.make_strategy_handler_result(
@@ -190,7 +187,7 @@ class RegexExecutor:
             if source_string:
                 result[field.key] = self.handle_strategy(source_string, field)
             else:
-                result[field.key] = None
+                result[field.key] = self.make_strategy_handler_result(None, source_string, field.strategy)
         return result
 
     def _validate_before_execute(self, data: str, patterns: List[ObjFieldPatternRegexConfig]):
