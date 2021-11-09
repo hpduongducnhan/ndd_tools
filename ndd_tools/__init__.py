@@ -9,7 +9,7 @@ from .regex_executor import RegexExecutor, load_regex_config_file, RegexResult
 from .schemas import RegexExecutorConfig
 
 
-__version__ = "1.2.5"
+__version__ = "1.2.6"
 
 __all__ = [
     'welcome',

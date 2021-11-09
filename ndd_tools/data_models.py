@@ -38,6 +38,7 @@ class TargetAPI(BaseModel):
     method: str
     header: Optional[Dict]
     parameters: Optional[Dict]
+    url_params: Optional[Dict]
     save_response: bool = False
 
 

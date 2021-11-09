@@ -78,7 +78,8 @@ class ApiClient(LoggerMixin):
         self,
         target_name: str,
         headers: Dict = None,
-        parameters: Dict = None
+        parameters: Dict = None,
+        url_params: Dict = None
     ) -> RequestResponse:
         if not self.config:
             self._load_config()
@@ -92,6 +93,7 @@ class ApiClient(LoggerMixin):
         _method = target.method
         _headers = target.header
         _parameters = target.parameters
+        _url_params = target.url_params
 
         # update params
         if headers:
@@ -99,13 +101,19 @@ class ApiClient(LoggerMixin):
             self.logger.debug(f'change request header -> {_headers}')
         if parameters:
             _parameters.update(parameters)
-            self.logger.debug(f'change parameters header -> {_parameters}')
+            self.logger.debug(f'change parameters  -> {_parameters}')
+        if url_params:
+            _url_params.update(url_params)
+            self.logger.debug(f'change url_params  -> {_url_params}')
 
         # handle url for method get
         if _method.lower() == 'get':
             _url = self._make_url_for_get_method(_url, _parameters)
             response = requests.get(_url, headers=_headers, verify=False)
+
         elif _method.lower() == 'post':
+            if _url_params:
+                _url = self._make_url_for_get_method(_url, _url_params)
             _jdata = json.dumps(_parameters)
             self.logger.debug(f'request body {_jdata}')
             response = requests.post(_url, headers=_headers, verify=False, data=_jdata)
